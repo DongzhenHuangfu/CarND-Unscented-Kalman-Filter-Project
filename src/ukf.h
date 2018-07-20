@@ -67,6 +67,10 @@ public:
   ///* Sigma point spreading parameter
   double lambda_;
 
+  std::vector<float> NIS_RADAR_;
+
+  std::vector<float> NIS_LIDAR_;
+
 
   /**
    * Constructor
