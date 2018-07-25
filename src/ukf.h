@@ -67,10 +67,13 @@ public:
   ///* Sigma point spreading parameter
   double lambda_;
 
-  std::vector<float> NIS_RADAR_;
+  int count_Lidar_;
 
-  std::vector<float> NIS_LIDAR_;
+  int count_Lidar_up_;
 
+  int count_Radar_;
+
+  int count_Radar_up_;
 
   /**
    * Constructor
@@ -81,6 +84,8 @@ public:
    * Destructor
    */
   virtual ~UKF();
+
+  void AugmentedSigmaPoints(MatrixXd* Xsig_out);
 
   /**
    * ProcessMeasurement
@@ -94,6 +99,8 @@ public:
    * @param delta_t Time between k and k+1 in s
    */
   void Prediction(double delta_t);
+
+  void UpdateUKF(int n_z, MatrixXd Zsig, MatrixXd z_pred, VectorXd z, MatrixXd S);
 
   /**
    * Updates the state and the state covariance matrix using a laser measurement

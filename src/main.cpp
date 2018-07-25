@@ -125,9 +125,12 @@ int main()
     	  estimate(2) = v1;
     	  estimate(3) = v2;
     	  
+    	  // cout<<"in main process"<<endl;
     	  estimations.push_back(estimate);
 
     	  VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
+
+    	  cout<<"RMSE: "<<endl<<RMSE<<endl;
 
           json msgJson;
           msgJson["estimate_x"] = p_x;
