@@ -6,7 +6,6 @@
 using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
-using std::vector;
 
 /**
  * Initializes Unscented Kalman filter
@@ -29,10 +28,10 @@ UKF::UKF() {
   P_ = MatrixXd(n_x_, n_x_);
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
-  std_a_ = 1;
+  std_a_ = 2;
 
   // Process noise standard deviation yaw acceleration in rad/s^2
-  std_yawdd_ = 0.5;
+  std_yawdd_ = 3;
   
   //DO NOT MODIFY measurement noise values below these are provided by the sensor manufacturer.
   // Laser measurement noise standard deviation position1 in m
@@ -92,7 +91,12 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
     // cout << "UKF: " << endl;
 
     weights_.fill(0.0);
-    x_.fill(0.0);
+
+    P_ << 1, 0, 0, 0, 0,
+          0, 1, 0, 0, 0,
+          0, 0, 1, 0, 0,
+          0, 0, 0, 1, 0,
+          0, 0, 0, 0, 1;
 
     if(meas_package.sensor_type_ == MeasurementPackage::RADAR){
       float rho = meas_package.raw_measurements_(0);
@@ -303,6 +307,8 @@ void UKF::UpdateUKF(int n_z, MatrixXd Zsig, MatrixXd z_pred, VectorXd z, MatrixX
   //update state mean and covariance matrix
   x_ += K * z_diff;
   P_ -= K*S*K.transpose();
+
+  return;
 }
 /**
  * Updates the state and the state covariance matrix using a laser measurement.
@@ -364,15 +370,17 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
   float e = (z - z_pred).transpose() * S.inverse() * (z - z_pred);
 
   count_Lidar_++;
-  if(e >= 3){
+  if(e >= 5.991){
     count_Lidar_up_++;
   }
   float percent = (float)count_Lidar_up_ / count_Lidar_;
 
-  cout<<"Lidar NIS, persent of over 90%: "<<percent<<", e:"<<e<<endl;
+  cout<<"Lidar NIS, persent of over 5.991 for 2D freedom: "<<percent<<", e:"<<e<<endl;
   cout<<"number of total:"<<count_Lidar_<<", number of up:"<<count_Lidar_up_<<endl;
 
   UpdateUKF(n_z, Zsig, z_pred, z, S);
+
+  return;
 
 }
 
@@ -464,7 +472,7 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
   }
   float percent = (float)count_Radar_up_ / count_Radar_;
 
-  cout<<"Radar NIS, persent of over 90%: "<<percent<<", e:"<<e<<endl;
+  cout<<"Radar NIS, persent of over 7.815 for 3D freedom: "<<percent<<", e:"<<e<<endl;
   cout<<"number of total:"<<count_Radar_<<", number of up:"<<count_Radar_up_<<endl;
 
   UpdateUKF(n_z, Zsig, z_pred, z, S);
